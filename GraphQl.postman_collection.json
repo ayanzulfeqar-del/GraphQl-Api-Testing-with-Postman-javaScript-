@@ -1,0 +1,268 @@
+{
+  "info": {
+    "_postman_id": "cd1f9ca7-f939-4cc8-a219-ef2cac1c8631",
+    "name": "GraphQl",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58580926",
+    "_collection_link": "https://go.postman.co/collection/58580926-cd1f9ca7-f939-4cc8-a219-ef2cac1c8631?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "mutationReq",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const jsonData = pm.response.json();\n\npm.test(\"status code check\", () => {\n    pm.response.to.have.status(200);\n});\n\npm.test(\"id check\", () => {\n    pm.expect(jsonData.data.createCharacter.id).to.be.a('number');\n    pm.expect(jsonData.data.createLocation).to.have.property(\"id\");\n    pm.expect(jsonData.data.createCharacter).to.have.property(\"id\");\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation($locationName:String!,$characterName:String!,$typeName:String!){\r\n  createLocation(location:{name:$locationName,type:\"city\",dimension:\"234\"})\r\n  {\r\n    id\r\n  }\r\n    createCharacter(character:{name: $characterName,type: $typeName,gender:\"male\",status:\"Alive\",species:\"Human\",image:\"png\",originId:7236,locationId: 7236})\r\n  {\r\n    id\r\n  }\r\n}\r\n",
+            "variables": "{\r\n  \"locationName\": \"newyork\",\r\n  \"characterName\": \"goodBOy\",\r\n  \"typeName\": \"ssm\"\r\n\r\n}"
+          }
+        },
+        "url": {
+          "raw": "https://rahulshettyacademy.com/gq/graphql",
+          "protocol": "https",
+          "host": [
+            "rahulshettyacademy",
+            "com"
+          ],
+          "path": [
+            "gq",
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "QuerryReq",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"test valdiation\", () => {\n    const datajson = pm.response.json();\n    pm.expect(datajson.data.character).to.have.all.keys(\"name\", \"type\", \"status\", \"gender\", \"origin\");\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query($chracterid:Int!){\r\n  character(characterId:$chracterid)\r\n  {\r\n    name\r\n    type\r\n    status\r\n    gender\r\n    origin{\r\n      id\r\n    }\r\n  }\r\n}",
+            "variables": "{\r\n  \"chracterid\": 6318\r\n}"
+          }
+        },
+        "url": {
+          "raw": "https://rahulshettyacademy.com/gq/graphql",
+          "protocol": "https",
+          "host": [
+            "rahulshettyacademy",
+            "com"
+          ],
+          "path": [
+            "gq",
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createEpisode",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation {\r\n  createEpisode(\r\n    episode: {\r\n      name: \"New Episode\"\r\n      air_date: \"29 jan\"\r\n      episode: \"S01E01\"\r\n    }\r\n  ) {\r\n    id\r\n  }\r\n}",
+            "variables": ""
+          }
+        },
+        "url": {
+          "raw": "https://rahulshettyacademy.com/gq/graphql",
+          "protocol": "https",
+          "host": [
+            "rahulshettyacademy",
+            "com"
+          ],
+          "path": [
+            "gq",
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "CreateLocation",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set(\"gql_location_name\", `QA_Location_${Date.now()}`);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\nconst location = body.data && body.data.createLocation;\r\n\r\npm.test(\"HTTP status is 200\", function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"GraphQL returned no errors\", function () {\r\n  pm.expect(body.errors).to.be.undefined;\r\n});\r\n\r\npm.test(\"A location ID was returned\", function () {\r\n  pm.expect(location && location.id).to.be.a(\"number\").and.above(0);\r\n});\r\n\r\nif (location && location.id !== undefined) {\r\n  pm.collectionVariables.set(\"gql_location_id\", location.id);\r\n}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation CreateLocation(\r\n  $locationName: String!,\r\n  $locationType: String!,\r\n  $dimension: String!\r\n) {\r\n  createLocation(\r\n    location: {\r\n      name: $locationName,\r\n      type: $locationType,\r\n      dimension: $dimension\r\n    }\r\n  ) {\r\n    id\r\n  }\r\n}",
+            "variables": "{\r\n  \"locationName\": \"{{gql_location_name}}\",\r\n  \"locationType\": \"city\",\r\n  \"dimension\": \"234\"\r\n}"
+          }
+        },
+        "url": {
+          "raw": "https://rahulshettyacademy.com/gq/graphql",
+          "protocol": "https",
+          "host": [
+            "rahulshettyacademy",
+            "com"
+          ],
+          "path": [
+            "gq",
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GetLocationById",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\nconst location = body.data && body.data.location;\r\n\r\npm.test(\"HTTP status is 200\", function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"GraphQL returned no errors\", function () {\r\n  pm.expect(body.errors).to.be.undefined;\r\n});\r\n\r\npm.test(\"Location was found\", function () {\r\n  pm.expect(location).to.be.an(\"object\");\r\n});\r\n\r\nif (location) {\r\n  pm.test(\"Returned ID matches the saved ID\", function () {\r\n    pm.expect(Number(location.id)).to.eql(\r\n      Number(pm.collectionVariables.get(\"gql_location_id\"))\r\n    );\r\n  });\r\n\r\n  pm.test(\"Returned name matches the generated name\", function () {\r\n    pm.expect(location.name).to.eql(\r\n      pm.collectionVariables.get(\"gql_location_name\")\r\n    );\r\n  });\r\n}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query GetLocation($locationId:Int!){location(locationId:$locationId){id name type dimension}}",
+            "variables": "{\"locationId\":{{gql_location_id}}}"
+          }
+        },
+        "url": {
+          "raw": "https://rahulshettyacademy.com/gq/graphql",
+          "protocol": "https",
+          "host": [
+            "rahulshettyacademy",
+            "com"
+          ],
+          "path": [
+            "gq",
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "createEpisode",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const runId = Date.now();\r\npm.collectionVariables.set(\"gql_episode_name\", `QA_Episode_${runId}`);\r\npm.collectionVariables.set(\"gql_episode_code\", `QA_${runId}`);"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const body = pm.response.json();\r\nconst episode = body.data && body.data.createEpisode;\r\n\r\npm.test(\"HTTP status is 200\", function () {\r\n  pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"GraphQL returned no errors\", function () {\r\n  pm.expect(body.errors).to.be.undefined;\r\n});\r\n\r\npm.test(\"An episode ID was returned\", function () {\r\n  pm.expect(episode && episode.id).to.be.a(\"number\").and.above(0);\r\n});\r\n\r\nif (episode && episode.id !== undefined) {\r\n  pm.collectionVariables.set(\"gql_episode_id\", episode.id);\r\n}"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation CreateEpisode(\r\n  $episodeName: String!,\r\n  $airDate: String!,\r\n  $episodeCode: String!\r\n) {\r\n  createEpisode(\r\n    episode: {\r\n      name: $episodeName,\r\n      air_date: $airDate,\r\n      episode: $episodeCode\r\n    }\r\n  ) {\r\n    id\r\n  }\r\n}",
+            "variables": "{\r\n  \"episodeName\": \"{{gql_episode_name}}\",\r\n  \"airDate\": \"{{gql_episode_air_date}}\",\r\n  \"episodeCode\": \"{{gql_episode_code}}\"\r\n}"
+          }
+        },
+        "url": {
+          "raw": "https://rahulshettyacademy.com/gq/graphql",
+          "protocol": "https",
+          "host": [
+            "rahulshettyacademy",
+            "com"
+          ],
+          "path": [
+            "gq",
+            "graphql"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "gql_location_name",
+      "value": ""
+    },
+    {
+      "key": "gql_location_id",
+      "value": ""
+    },
+    {
+      "key": "gql_episode_name",
+      "value": ""
+    },
+    {
+      "key": "gql_episode_code",
+      "value": ""
+    },
+    {
+      "key": "gql_episode_id",
+      "value": ""
+    }
+  ]
+}
